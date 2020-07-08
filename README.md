@@ -46,3 +46,21 @@ or just:
 and:
 
 `docker-compose exec php php notifier.php`
+
+## db backup and restoration
+
+#### Backup
+
+`docker-compose exec mysql bash -c 'mysqldump -u "$MYSQL_USER" -p"$MYSQL_PASSWORD" --databases db' > ./docker/db_dump.sql`
+
+#### Restore
+
+##### Option 1:
+
+`docker-compose exec -T mysql bash -c 'mysql -u"$MYSQL_USER" -p"$MYSQL_PASSWORD" --force' < ./docker/db_dump.sql`
+
+##### Option 2:
+
+On a fresh install, have the sql dump as a volume in docker-compose.yml:
+
+`- ./docker/db_dump.sql:/docker-entrypoint-initdb.d/db_dump.sql`
