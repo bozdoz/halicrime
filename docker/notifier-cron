@@ -1,2 +1,2 @@
 # m h  dom mon dow   command
-0 22 * * *   /usr/bin/python /app/halicrime.py load_data && /usr/local/bin/php /app/notifier.php
+0 22 * * 1,5   /usr/bin/python /app/halicrime.py load_data && /usr/local/bin/php /app/notifier.php

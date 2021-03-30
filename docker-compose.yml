@@ -23,7 +23,8 @@ services:
       - db:/var/lib/mysql
       - ./docker/init.sql:/docker-entrypoint-initdb.d/init.sql
       # for backup restoration
-      # - ./docker/db_dump.sql:/docker-entrypoint-initdb.d/db_dump.sql
+      # - ./docker/halicrime.sql:/docker-entrypoint-initdb.d/db_dump.sql
+    restart: always
 
   php:
     build:
@@ -37,6 +38,7 @@ services:
       DB_HOST: mysql
     depends_on:
       - mysql
+    restart: always
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
