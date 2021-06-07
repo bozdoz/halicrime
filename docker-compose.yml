@@ -40,16 +40,16 @@ services:
       - mysql
     restart: always
 
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    ports:
-      - 8080:80
-    depends_on:
-      - mysql
-    environment:
-      PMA_HOST: mysql
-      PMA_USER: ${MYSQL_USER:-dbuser}
-      PMA_PASSWORD: ${MYSQL_PASSWORD:-dbpass}
+#  phpmyadmin:
+#    image: phpmyadmin/phpmyadmin
+#    ports:
+#      - 8080:80
+#    depends_on:
+#      - mysql
+#    environment:
+#      PMA_HOST: mysql
+#      PMA_USER: ${MYSQL_USER:-dbuser}
+#      PMA_PASSWORD: ${MYSQL_PASSWORD:-dbpass}
 
 volumes:
   db:
