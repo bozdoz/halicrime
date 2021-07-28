@@ -1,0 +1,13 @@
+.env*
+.git*
+LICENSE
+README.md
+.devcontainer/
+vendor/
+.DS_Store
+.dockerignore
+docker-compose.yml
+docker/*
+!docker/notifier-cron
+!docker/docker-entrypoint.sh
+data/

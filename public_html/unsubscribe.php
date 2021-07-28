@@ -2,10 +2,6 @@
 
 include '../util.php';
 
-$config = parse_ini_file(dirname(dirname(__FILE__)) . "/settings.cfg", true);
-$STATIC_API_KEY = $config['google_maps']['static_api_key'];
-$SITE_DOMAIN = getenv('SITE_DOMAIN');
-
 function cancelSubscription($guid) {
   $connection = connect_db();
   // Get active subscriptions

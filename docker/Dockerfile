@@ -48,5 +48,10 @@ COPY ./docker/notifier-cron /etc/cron.d
 RUN chmod 0644 /etc/cron.d/notifier-cron \
     && crontab /etc/cron.d/notifier-cron
 
+#
+# copy the rest
+#
+COPY . .
+
 ENTRYPOINT [ "docker-entrypoint.sh" ]
 CMD ["php-fpm"]
