@@ -1,4 +1,4 @@
-FROM php:fpm
+FROM php@sha256:76bf9b899f85d86aca0b58cda6f1ea33e3511351646bdccb16059a2e8133a770
 
 WORKDIR /app
 
