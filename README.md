@@ -64,3 +64,9 @@ and:
 On a fresh install, have the sql dump as a volume in docker-compose.yml:
 
 `- ./docker/db_dump.sql:/docker-entrypoint-initdb.d/db_dump.sql`
+
+## Output as CSV
+
+```sh
+docker-compose exec mysql bash -c 'mysql -u"$MYSQL_USER" -p"$MYSQL_PASSWORD" -e "select * from db.events" | sed "s/\t/,/g"' > events.csv
+```
