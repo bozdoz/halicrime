@@ -2,7 +2,7 @@ version: "3"
 
 services:
   nginx:
-    image: nginx
+    image: nginx:stable-alpine
     # command: [nginx-debug, "-g", "daemon off;"]
     volumes:
       # share php files with php service
@@ -13,7 +13,7 @@ services:
       - ${PORT:-1902}:80
 
   mysql:
-    image: mariadb
+    image: mariadb:11.1
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpass}
       MYSQL_DATABASE: ${MYSQL_DATABASE:-db}
@@ -24,7 +24,7 @@ services:
       - ./docker/init.sql:/docker-entrypoint-initdb.d/init.sql
       # for backup restoration
       # - ./docker/halicrime.sql:/docker-entrypoint-initdb.d/db_dump.sql
-    restart: always
+    restart: on-failure:3
 
   php:
     build:
@@ -38,7 +38,7 @@ services:
       DB_HOST: mysql
     depends_on:
       - mysql
-    restart: always
+    restart: on-failure:3
 
 #  phpmyadmin:
 #    image: phpmyadmin/phpmyadmin
