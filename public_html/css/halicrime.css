@@ -1,3 +1,7 @@
+body {
+  padding-top: 40px;
+  padding-bottom: 50vh;
+}
 
 #map-canvas {
     width: 100%;
