@@ -1,4 +1,4 @@
-FROM php@sha256:76bf9b899f85d86aca0b58cda6f1ea33e3511351646bdccb16059a2e8133a770
+FROM php:8.4.12-fpm
 
 WORKDIR /app
 
@@ -11,9 +11,9 @@ RUN docker-php-ext-install mysqli \
     && apt-get update \
     && apt-get install -y \
     msmtp \
-    python \
-    python-pip \
-    python-dev \
+    python3 \
+    python3-dev \
+    python3-pip \
     mariadb-server \
     cron \
     git \
@@ -23,7 +23,7 @@ RUN docker-php-ext-install mysqli \
 # get requirements for python script
 #
 COPY requirements.txt .
-RUN pip install -r requirements.txt
+RUN pip install -r requirements.txt --break-system-packages
 
 #
 # install composer for phpmailer

@@ -12,16 +12,16 @@ sudo pip install twython
 
 import urllib
 import datetime
+from dateutil import parser
 import pymysql as MySQLdb
 import twython
-import locale
 import os
 import sys
 import logging
 import filecmp
 import shutil
-import ConfigParser
 import json
+from pyproj import Transformer
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 LOG_DIR = os.path.join(CURRENT_DIR, 'logs')
@@ -33,21 +33,18 @@ if not os.path.isdir(LOG_DIR):
 logging.basicConfig(filename=LOG_FILE,
                     format='%(asctime)s %(levelname)s: %(message)s', level=logging.INFO)
 
-config = ConfigParser.ConfigParser()
-config.read('%s/settings.cfg' % CURRENT_DIR)
+DATA_URL = os.getenv('DATA_URL', 'https://opendata.arcgis.com/datasets/f6921c5b12e64d17b5cd173cafb23677_0.geojson')
 
-DATA_URL = config.get('main', 'data_url')
-
-TWITTER_CONSUMER_KEY = config.get('twitter', 'consumer_key')
-TWITTER_CONSUMER_SECRET = config.get('twitter', 'consumer_secret')
-TWITTER_ACCESS_KEY = config.get('twitter', 'access_key')
-TWITTER_ACCESS_SECRET = config.get('twitter', 'access_secret')
-RATE_LIMIT = config.get('twitter', 'rate_limit')
+TWITTER_CONSUMER_KEY = 'abc'
+TWITTER_CONSUMER_SECRET = 'def'
+TWITTER_ACCESS_KEY = 'ghi'
+TWITTER_ACCESS_SECRET = 'jkl'
+RATE_LIMIT = 123
 
 DB_HOST = os.getenv('DB_HOST') or 'localhost'
-DB_USERNAME = config.get('db', 'db_user') or os.getenv('MYSQL_USER')
-DB_PASSWORD = config.get('db', 'db_pass') or os.getenv('MYSQL_PASSWORD')
-DB_NAME = config.get('db', 'db_name') or os.getenv('MYSQL_DATABASE')
+DB_USERNAME = os.getenv('MYSQL_USER')
+DB_PASSWORD = os.getenv('MYSQL_PASSWORD')
+DB_NAME = os.getenv('MYSQL_DATABASE')
 
 
 def get_twitter_api():
@@ -95,7 +92,8 @@ def load_data():
 
     # Download CSV
     print('Downloading latest GEOJSON.')
-    urllib.urlretrieve(DATA_URL, latest)
+    with urllib.request.urlopen(DATA_URL) as response, open(latest, "wb") as out_file:
+        out_file.write(response.read())
 
     # Check if new file is same as old
     if os.path.isfile(prev) and filecmp.cmp(latest, prev):
@@ -104,9 +102,16 @@ def load_data():
         return
 
     new_events = 0
+
+
     # If it has new data, load data into DB
     with open(latest, 'r') as geojson_file:
         data = json.load(geojson_file)
+
+        # @since Sep 13, 2025 this is no longer lat/lng (EPSG:4326), but "EPSG:3857"
+        crs = data['crs']['properties']['name']
+
+        transformer = Transformer.from_crs(crs, "EPSG:4326", always_xy=True)
 
         features = data['features']
 
@@ -117,14 +122,15 @@ def load_data():
                 print('Examining row:')
                 print(props)
                 longitude, latitude = row['geometry']['coordinates']
+                longitude, latitude = transformer.transform(longitude, latitude)
+                print(longitude, latitude)
                 event_id = props['evt_rin']
                 event_date = get_date_from_string(props['evt_date'])
                 street_name = props['location']
                 event_type_id = props['rucr']
                 event_type_name = props['rucr_ext_d']
             except Exception as e:
-                print('Something wrong with this row:')
-                print(props)
+                print('Something wrong with this row')
                 logging.info('Something wrong with this row: %s', row)
                 logging.exception(e)
                 continue
@@ -167,10 +173,9 @@ def get_date_from_string(datelike):
         # original format
         dateformat = '%Y-%m-%d'
     else:
-        # possibly timestamp
-        # @since May 6, 2020
-        seconds = int(datelike) / 1000
-        return datetime.datetime.utcfromtimestamp(seconds).date()
+        # parse it somehow
+        # @since Sep 13, 2025
+        return parser.parse(datelike).date()
 
     return datetime.datetime.strptime(datelike[:10], dateformat).date()
 

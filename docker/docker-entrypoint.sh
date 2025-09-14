@@ -43,12 +43,12 @@ wait_for() {
 
 # check if main script
 if [ "$@" = "php-fpm" ]; then
-    wait_for "mysqladmin ping -u $MYSQL_USER -p$MYSQL_PASSWORD -h mysql"
+    wait_for "mysqladmin ping -u $MYSQL_USER -p$MYSQL_PASSWORD -h mysql --skip-ssl"
 
     #
     # run python script
     #
-    python halicrime.py load_data
+    python3 halicrime.py load_data
 
     #
     # set environment variables for cron
